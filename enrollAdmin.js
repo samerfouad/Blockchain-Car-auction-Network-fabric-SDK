@@ -1,5 +1,4 @@
-/*
- Copyright 2018 IBM All Rights Reserved.
+/* Copyright 2018 IBM All Rights Reserved.
  Licensed under the Apache License, Version 2.0 (the 'License');
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -8,11 +7,7 @@
  distributed under the License is distributed on an 'AS IS' BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
- limitations under the License.
-*/
-/*
- * Enroll the admin user
- */
+ limitations under the License.*/
 
 'use strict';
 
@@ -40,7 +35,7 @@ Fabric_Client.newDefaultKeyValueStore({
   crypto_suite.setCryptoKeyStore(crypto_store);
   fabric_client.setCryptoSuite(crypto_suite);
   // be sure to change the http to https when the CA is running TLS enabled
-  fabric_ca_client = new Fabric_CA_Client('https://<enrollID>:<enrollSecret>@<ca_url_with_port>', null ,'<caName>', crypto_suite);
+  fabric_ca_client = new Fabric_CA_Client('https://admin:8cb9ab4da0@nab011f305de84ef89d7d0a7ad7c54619-org1-ca.uk04.blockchain.ibm.com:31011', null ,'org1CA', crypto_suite);
   // first check to see if the admin is already enrolled
   return fabric_client.getUserContext('admin', true);
 }).then((user_from_store) => {
@@ -52,7 +47,7 @@ Fabric_Client.newDefaultKeyValueStore({
     // need to enroll it with CA server
     return fabric_ca_client.enroll({
       enrollmentID: 'admin',
-      enrollmentSecret: '<enrollSecret>'
+      enrollmentSecret: '8cb9ab4da0'
     }).then((enrollment) => {
       console.log('Successfully enrolled admin user "admin"');
       return fabric_client.createUser(
