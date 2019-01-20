@@ -1,27 +1,23 @@
-/*
- Copyright 2018 IBM All Rights Reserved.
+/* Copyright 2018 IBM All Rights Reserved.
  Licensed under the Apache License, Version 2.0 (the 'License');
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-		http://www.apache.org/licenses/LICENSE-2.0
+ You may not use this file except in compliance with the License.
+ You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an 'AS IS' BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
- limitations under the License.
-*/
-/*
- * Chaincode Invoke
- */
+ limitations under the License.*/
 
 'use strict';
 
 var creds = require('./creds.json');
-var Fabric_Client = require('fabric-client');
 var path = require('path');
-var util = require('util');
-
+var Fabric_Client = require('fabric-client');
 var fabric_client = new Fabric_Client();
+
+var funcName = process.argv[2];
+var array = process.argv;
+array.shift(); array.shift(); array.shift();
 
 // setup the fabric network
 var channel = fabric_client.newChannel('defaultchannel');
@@ -52,27 +48,47 @@ Fabric_Client.newDefaultKeyValueStore({
   return fabric_client.getUserContext('admin', true);
 }).then((user_from_store) => {
   if (user_from_store && user_from_store.isEnrolled()) {
-    console.log('Successfully loaded user1 from persistence');
     member_user = user_from_store;
   } else {
-    throw new Error('Failed to get user1.... run registerUser.js');
+    throw new Error('Failed to get admin');
   }
 
   // get a transaction id object based on the current user assigned to fabric client
   tx_id = fabric_client.newTransactionID();
-  console.log('Assigning transaction_id: ', tx_id._transaction_id);
-
+  
   // must send the proposal to endorsing peers
+  
+  
+  
   var request = {
           chaincodeId: 'carauction',
-          fcn: 'initLedger',
-          args: [''],
+          fcn: funcName,//'initLedger', 
+          args: array,
           chainId: 'mychannel',
           txId: tx_id
       };
   // send the transaction proposal to the peers
-  return channel.sendTransactionProposal(request);
+  if (funcName === "query"){
+    return channel.queryByChaincode(request);
+  } else {
+    return channel.sendTransactionProposal(request);
+  }
 }).then((results) => {
+  if (funcName === "query"){
+    if (results && results.length == 1) {
+      if (results[0] instanceof Error) {
+        console.error('error from query = ', results[0]);
+      } else {
+        console.log('Response is ', results[0].toString());
+      }
+    } else {
+      console.log('No payloads were returned from query');      
+    }
+    return;
+  } else {
+
+  }
+  
   var proposalResponses = results[0];
   var proposal = results[1];
   let isProposalGood = false;
@@ -84,9 +100,6 @@ Fabric_Client.newDefaultKeyValueStore({
     console.error(results);
   }
   if (isProposalGood) {
-    console.log(util.format(
-      'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s"',
-      proposalResponses[0].response.status, proposalResponses[0].response.message));
 
     // build up the request for the orderer to have the transaction committed
     var request = {
@@ -157,9 +170,15 @@ Fabric_Client.newDefaultKeyValueStore({
 
   if (results && results[1] && results[1].event_status === 'VALID') {
     console.log('Successfully committed the change to the ledger by the peer');
+    if(funcName === "query"){
+      console.log('Response is ', results[0].toString());
+      console.log(results);
+    }
   } else {
     console.log('Transaction failed to be committed to the ledger due to ::' + results[1].event_status);
   }
+
+
 }).catch((err) => {
   console.error('Failed to invoke successfully :: ' + err);
 });
