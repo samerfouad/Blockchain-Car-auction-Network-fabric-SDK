@@ -9,7 +9,6 @@
 
 'use strict';
 const shim = require('fabric-shim');
-const util = require('util');
 
 let Chaincode = class {
 
@@ -82,8 +81,8 @@ let Chaincode = class {
     if (!queryAsBytes || queryAsBytes.toString().length <= 0) {
       throw new Error('key' + ' does not exist: ');
     }
-    console.info('query response: ');
-    console.info(queryAsBytes.toString());
+    console.info('query response: ' + queryAsBytes.toString());
+    //console.info(queryAsBytes.toString());
     return queryAsBytes;
   }
 
@@ -180,7 +179,7 @@ let Chaincode = class {
 
     //check to ensure bidder has enough balance to make the bid
     if (member.balance < offer.bidPrice) {
-      throw new Error('The bid is higher than the balance in your account!');
+      throw new Error('The bid is higher than the balance in this account!');
     }
 
     //check to ensure bidder can't bid on own item
