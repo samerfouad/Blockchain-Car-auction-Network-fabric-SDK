@@ -150,7 +150,10 @@ let Chaincode = class {
     await stub.putState(args[1], Buffer.from(JSON.stringify(listing)));
   }
 
-  async closeBidding(stub, args) { //Close the bidding for a vehicle listing and choose the highest bid as the winner
+  async closeBidding(stub, args) {
+    if (args.length != 1) {
+      throw new Error('Incorrect number of arguments. Expecting 1');
+    }
     let listingKey = args[0];
 
     //check if listing exists
@@ -165,7 +168,7 @@ let Chaincode = class {
     //can only close bidding if there are offers
     if (listing.offers && listing.offers.length > 0) {
       
-      //use built in JavaScript array sort method - returns highest value at the first index
+      //use built in JavaScript array sort method - returns highest value at the first index - i.e. highest bid
       listing.offers.sort(function (a, b) {
         return (b.bidPrice - a.bidPrice);
       });
@@ -175,26 +178,34 @@ let Chaincode = class {
 
       //bid must be higher than reserve price, otherwise we can not sell the car
       if (highestOffer.bidPrice >= listing.reservePrice) {
+        let buyer = highestOffer.member;
 
-        //get reference to buyer
-        let buyerAsBytes = await stub.getState(highestOffer.member);
+        //get the buyer i.e. the highest bidder on the vehicle
+        let buyerAsBytes = await stub.getState(buyer);
         if (!buyerAsBytes || buyerAsBytes.toString().length <= 0) {
-          throw new Error('buyer does not exist: ');
+          throw new Error('vehicle does not exist: ');
         }
-        let buyer = JSON.parse(buyerAsBytes);
+
+        //save a reference of the buyer for later - need this reference to update account balance
+        buyer = JSON.parse(buyerAsBytes);
 
         //get reference to vehicle so we can get the owner i.e. the seller 
         let vehicleAsBytes = await stub.getState(listing.vehicle); 
         if (!vehicleAsBytes || vehicleAsBytes.toString().length <= 0) {
           throw new Error('vehicle does not exist: ');
         }
-        let vehicle = JSON.parse(vehicleAsBytes);
+
+        //now that we have the reference to the vehicle object, 
+        //we can find the owner of the vehicle bc the vehicle object has a field for owner
+        var vehicle = JSON.parse(vehicleAsBytes);
         
         //get reference to the owner of the vehicle i.e. the seller
         let sellerAsBytes = await stub.getState(vehicle.owner); 
         if (!sellerAsBytes || sellerAsBytes.toString().length <= 0) {
-          throw new Error('seller does not exist: ');
+          throw new Error('vehicle does not exist: ');
         }
+
+        //the seller is the current vehicle owner
         let seller = JSON.parse(sellerAsBytes);
         
         //ensure all strings get converted to ints
@@ -219,21 +230,24 @@ let Chaincode = class {
         listing.offers = null;
         listing.listingState = 'SOLD';
 
-        //update the balance of the buyer and seller
+        //update the balance of the buyer 
         await stub.putState(highestOffer.member, Buffer.from(JSON.stringify(buyer)));
+        
+        //update the balance of the seller i.e. old owner
         await stub.putState(oldOwner, Buffer.from(JSON.stringify(seller)));
         
         //update the listing, use listingId as key, and the listing object as the value
         await stub.putState(listingKey, Buffer.from(JSON.stringify(listing)));        
       }
     }
+
     if (highestOffer) {
+      //update the owner of the vehicle
       await stub.putState(listing.vehicle, Buffer.from(JSON.stringify(vehicle)));
     } else { 
       throw new Error('offers do not exist: '); 
     }
   }
-
 };
 
 shim.start(new Chaincode()); 
