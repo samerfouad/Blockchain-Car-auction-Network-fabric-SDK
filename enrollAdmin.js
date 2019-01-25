@@ -20,24 +20,23 @@ const enrollSecret = "WRITE_THE_ENROLL_SECRET_HERE";//write the enroll secret he
 const ca_url_with_port = "WRITE_THE_CA_URL_WITH_PORT_HERE";//write the CA URL with port here
 const caName = "org1CA";
 
-var fabric_client = new Fabric_Client();
-var fabric_ca_client = null;
-var admin_user = null;
-var store_path = path.join(__dirname, 'hfc-key-store');
+let fabric_client = new Fabric_Client();
+let fabric_ca_client = null;
+let admin_user = null;
+let store_path = path.join(__dirname, 'hfc-key-store');
 
 Fabric_Client.newDefaultKeyValueStore({
   path: store_path
 }).then((state_store) => {
   fabric_client.setStateStore(state_store);
-  var crypto_suite = Fabric_Client.newCryptoSuite();
-  var crypto_store = Fabric_Client.newCryptoKeyStore({ path: store_path });
+  let crypto_suite = Fabric_Client.newCryptoSuite();
+  let crypto_store = Fabric_Client.newCryptoKeyStore({ path: store_path });
   crypto_suite.setCryptoKeyStore(crypto_store);
   fabric_client.setCryptoSuite(crypto_suite);
   fabric_ca_client = new Fabric_CA_Client('https://' + enrollID + ':' + enrollSecret + '@' + ca_url_with_port, null , caName, crypto_suite);
-  return fabric_client.getUserContext(enrollID, true); // check if the admin is already enrolled
+  return fabric_client.getUserContext(enrollID, true); 
 }).then((user_from_store) => {
-  if (user_from_store && user_from_store.isEnrolled()) {
-    console.log('Successfully loaded admin from persistence');
+  if (user_from_store && user_from_store.isEnrolled()) {// check if the admin is already enrolled
     admin_user = user_from_store;
     return null;
   } else {
@@ -45,7 +44,6 @@ Fabric_Client.newDefaultKeyValueStore({
       enrollmentID: enrollID,
       enrollmentSecret: enrollSecret
     }).then((enrollment) => {
-      console.log('Successfully enrolled admin user "admin"');
       return fabric_client.createUser(
         {
           username: enrollID,
