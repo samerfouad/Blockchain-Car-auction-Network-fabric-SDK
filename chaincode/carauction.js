@@ -150,10 +150,7 @@ let Chaincode = class {
     await stub.putState(args[1], Buffer.from(JSON.stringify(listing)));
   }
 
-  async closeBidding(stub, args) {
-    if (args.length != 1) {
-      throw new Error('Incorrect number of arguments. Expecting 1');
-    }
+  async closeBidding(stub, args) { //Close the bidding for a vehicle listing and choose the highest bid as the winner  
     let listingKey = args[0];
 
     //check if listing exists
@@ -161,93 +158,64 @@ let Chaincode = class {
     if (!listingAsBytes || listingAsBytes.toString().length <= 0) {
       throw new Error('listing does not exist: ');
     }
-    var listing = JSON.parse(listingAsBytes);
+    let listing = JSON.parse(listingAsBytes);
     listing.listingState = 'RESERVE_NOT_MET';
     let highestOffer = null;
 
-    //can only close bidding if there are offers
-    if (listing.offers && listing.offers.length > 0) {
+    if (listing.offers && listing.offers.length > 0) {//close bidding if there are offers
       
-      //use built in JavaScript array sort method - returns highest value at the first index - i.e. highest bid
-      listing.offers.sort(function (a, b) {
+      listing.offers.sort(function (a, b) {//use builtin JS array sort method that returns highest value at the first index
         return (b.bidPrice - a.bidPrice);
       });
-
-      //get a reference to our highest offer - this object includes the bid price as one of its fields
       highestOffer = listing.offers[0];
 
-      //bid must be higher than reserve price, otherwise we can not sell the car
-      if (highestOffer.bidPrice >= listing.reservePrice) {
-        let buyer = highestOffer.member;
+      if (highestOffer.bidPrice >= listing.reservePrice) { //bid must be higher than reserve price
 
-        //get the buyer i.e. the highest bidder on the vehicle
-        let buyerAsBytes = await stub.getState(buyer);
+        let buyerAsBytes = await stub.getState(highestOffer.member);
         if (!buyerAsBytes || buyerAsBytes.toString().length <= 0) {
-          throw new Error('vehicle does not exist: ');
+          throw new Error('buyer does not exist: ');
         }
+        let buyer = JSON.parse(buyerAsBytes);
 
-        //save a reference of the buyer for later - need this reference to update account balance
-        buyer = JSON.parse(buyerAsBytes);
-
-        //get reference to vehicle so we can get the owner i.e. the seller 
         let vehicleAsBytes = await stub.getState(listing.vehicle); 
         if (!vehicleAsBytes || vehicleAsBytes.toString().length <= 0) {
           throw new Error('vehicle does not exist: ');
         }
-
-        //now that we have the reference to the vehicle object, 
-        //we can find the owner of the vehicle bc the vehicle object has a field for owner
         var vehicle = JSON.parse(vehicleAsBytes);
         
-        //get reference to the owner of the vehicle i.e. the seller
         let sellerAsBytes = await stub.getState(vehicle.owner); 
         if (!sellerAsBytes || sellerAsBytes.toString().length <= 0) {
           throw new Error('vehicle does not exist: ');
         }
-
-        //the seller is the current vehicle owner
         let seller = JSON.parse(sellerAsBytes);
         
-        //ensure all strings get converted to ints
-        let sellerBalance = parseInt(seller.balance, 10);
-        let highOfferBidPrice = parseInt(highestOffer.bidPrice, 10);
+        let highOfferBidPrice = parseInt(highestOffer.bidPrice, 10);        
         let buyerBalance = parseInt(buyer.balance, 10);
-
-        //increase balance of seller
-        sellerBalance += highOfferBidPrice;
-        seller.balance = sellerBalance;
+        let sellerBalance = parseInt(seller.balance, 10);
         
-        //decrease balance of buyer by the amount of the bid price
-        buyerBalance -= highestOffer.bidPrice;
-        buyer.balance = buyerBalance;
+        buyer.balance  = buyerBalance  - highOfferBidPrice;
+        seller.balance = sellerBalance + highOfferBidPrice;
         
-        //need reference to old owner so we can update their balance later
         let oldOwner = vehicle.owner;
-        
-        //assign person with highest bid as new owner
         vehicle.owner = highestOffer.member;
-        
         listing.offers = null;
         listing.listingState = 'SOLD';
 
-        //update the balance of the buyer 
-        await stub.putState(highestOffer.member, Buffer.from(JSON.stringify(buyer)));
-        
-        //update the balance of the seller i.e. old owner
-        await stub.putState(oldOwner, Buffer.from(JSON.stringify(seller)));
-        
-        //update the listing, use listingId as key, and the listing object as the value
-        await stub.putState(listingKey, Buffer.from(JSON.stringify(listing)));        
+        await stub.putState(highestOffer.member,  Buffer.from(JSON.stringify(buyer)));      
+        await stub.putState(oldOwner,             Buffer.from(JSON.stringify(seller)));
+        await stub.putState(listingKey,           Buffer.from(JSON.stringify(listing))); 
+
       }
     }
 
     if (highestOffer) {
-      //update the owner of the vehicle
       await stub.putState(listing.vehicle, Buffer.from(JSON.stringify(vehicle)));
     } else { 
       throw new Error('offers do not exist: '); 
     }
+
   }
+
 };
 
 shim.start(new Chaincode()); 
