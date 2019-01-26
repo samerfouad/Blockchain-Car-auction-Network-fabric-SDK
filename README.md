@@ -143,45 +143,45 @@ Let's run our app and see what it can do. We start by running the command:
 ```
 node invoke.js initLedger
 ```
-Note that the `initLedger` command creates a car and assigned the owner of the car to be `memberA@acme.org`. 
+Note that the `initLedger` creates a car owned by `memberA@acme.org` and a listing as well as other participants. 
 
-Then, we can run:
+Then, we can run the command:
 ```
 node invoke.js makeOffer 3000 ABCD memberA@acme.org
 ```
 Our auction does not allow the owner of car to bid on his/her own car. 
 <b>Thus, this call should give us an error.</b> 
 
-Next, let's give a successful transaction by running. 
+Next, let's give a successful transaction by running the command. 
 ```
 node invoke.js makeOffer 4000 ABCD memberB@acme.org
 ```
 This should work, and now we have an offer from MemberB coming in at $4,000. 
 If we check the channel in Starter Plan, we can see the data that was written to the ledger.
 
-Next, let's give another successful offer by running. 
+Next, let's give another successful offer by running the command. 
 ```
 node invoke.js makeOffer 5000 ABCD memberC@acme.org
 ```
 This will create an offer from Member C coming in at $5,000, which is greater than the reserve price.
-If we check the Starter Plan again, we can see this data being written to the ledger, and the block count
+If we check the Starter Plan again, we can see this data being written to the ledger and the block count
 increasing by one.
 
-Next, let's give an offer that is too high, i.e., it is greater than the balance in the account.
+Next, let's give an offer that is too high, i.e., it is greater than the balance in the account by running the command.
 ```
 node invoke.js makeOffer 5001 ABCD memberB@acme.org
 ```
 Since our members are initialized with a balance of $5,000, this will not work. 
 
-Lastly, let's close the bidding. 
+Lastly, let's close the bidding by running the command. 
 ```
 node invoke.js closeBidding ABCD
 ```
 We should get a successful response. 
 If you check the output of the block details, we can see that the new owner of the car is MemberC. 
 We also see that Member C now has $0 in their balance, since they had $5,000 to start with, and their bid of $5,000 won the auction. 
-That means that the new owner is Member C, and that Member A, the original owner of the car, will be credited $5,000. 
-This is reflected on the ledger - Member A now has a balance of $10,000. 
+That means that the new owner is MemberC, and that Member A, the original owner of the car, will be credited $5,000. 
+This is reflected in the ledger - MemberA now has a balance of $10,000. 
 Lastly, if we check the vehicle listing, we can see that the status is `SOLD`.
 
 ## Step 5. Querying the Ledger
