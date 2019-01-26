@@ -67,7 +67,13 @@ $ cd car-auction-network-fabric-node-sdk
 ## Step 2. Enroll App 
  
 First, we need to generate the necessary keys and certs from the Certificate Authority to prove our authenticity to the network.
-To do this, we will go into our new IBM Blockchain Platform Starter Plan network, and from the `Overview` Tab on the left, we will click on `Connection Profile` on the right-side of the page. Then click on `Raw JSON`.
+To do this, we need to download the connection profile, and move it to our current working directory. 
+1. From IBM Blockchain Platform Starter Plan, we click on the `Overview` tab in the top-left corner.
+2. From the `Overview` tab, we click on `Connection Profile`.
+3. Then, we Click on `Download` to download a file that looks something like this: `creds_nde288ef7dd6542d3a1cc824a02be67f1_org1.json`. 
+4. Rename the file to: `creds.json`. 
+<b>And yes, this is important. It needs to be exactly `creds.json`, since this file is referenced at the top of </b>`invoke.js`.
+5. Move the `creds.json` file to the `car-auction-network-fabric-node-sdk` directory. 
 
 Open `enrolladmin.js` in an editor of your choice. I prefer VSCode.
 
@@ -90,26 +96,8 @@ $ node enrollAdmin.js
 ```
 
 ## Step 3. Invoking Chaincode 
-![packageFile](/docs/invoke.gif)
 
-Now, we need to download the connection profile, and move it to our current working directory. 
-1. Go back to your IBM Blockchain Platform Starter Plan, and click on the `Overview` tab in the top-left corner.
-2. From the `Overview` tab, click on `Connection Profile`.
-3. Once you click on `Connection Profile` you'll have an option to view as `Raw JSON` or `Download`. Click on `Download`. 
-
-This should automatically download the file and add it to your recently downloaded folder.
-This recently downloaded file will look something like this:
-
-`creds_nde288ef7dd6542d3a1cc824a02be67f1_org1.json`. 
-
-4. Rename the file to: `creds.json`. 
-
-<b>And yes, this is important. It needs to be exactly `creds.json`, since 
-this file is referenced at the top of </b>`invoke.js` - https://github.com/IBM/car-auction-network-fabric-node-sdk/blob/master/invoke.js#L10.
-
-5. Move the `creds.json` file to the `car-auction-network-fabric-node-sdk` directory. 
-
-Next, we need to install the chaincode on the peers. Then, we will need to instantiate the chaincode. 
+We need to install the chaincode on the peers. Then, we will need to instantiate the chaincode. 
 From the `Overview` tab on the left, click on `Install Code` on the bottom-left hand side of the screen. Then, click on `Install Chaincode` on 
 the right-side of the screen.
 
@@ -201,8 +189,7 @@ If you look around line 60 of `invoke.js` you should see this:
 This is where we call the different functions in our chaincode. By default, we call initLedger.
 This is why our new block reflects this function call. 
 
-## Step 5. Running the app 
-![packageFile](/docs/runApp.gif)
+## Step 4. Running the app 
 
 Now that we have connected our app to the IBM Blockchain Platform, each update of the ledger will
 be recorded and added as a block. Let's run our app and see what it can do. You can find all
@@ -322,8 +309,7 @@ if we check the vehicle listing, we can see that the status is `SOLD`.
 Awesome! You just successfully ran an auction app while using Hyperledger Fabric Node SDK + IBM Blockchain Platform
 Starter Plan. There's only one more thing I want to show you before you leave...
 
-## Step 6. Querying the Ledger
-![packageFile](/docs/query.gif)
+## Step 5. Querying the Ledger
 
 Now that we have submitted transactions on the ledger, we can query the ledger at any point, using the 
 key corresponding to that object. So first, let's query Member A. This is the member that just won 
@@ -409,40 +395,6 @@ The response:
 ```
 Response is  {"description":"Arium Nova","listingState":"SOLD","offers":null,"reservePrice":3500,"vehicle":"1234"}
 ```
-## Step 7. Conclusion + Updating Chaincode
-Congrats!
-
-🙌🏼🙌🏼🙌🏼
-
-That's it! I showed you how to register your application and then register users 
-to your application using certificates provided by the Certificate Authority. Next,
-I showed you how to download your connection profile and use it to create a 
-channel and add peers and an orderer to that channel. After that, we used the IBM
-Blockchain Starter Plan to install our chaincode on the peers, and then 
-instantiated our network on the defaultchannel. Next, we invoked our chaincode 
-and created some offers on the network. We closed the bidding and saw our ledger
-being updated as Member C won the auction. Lastly, we learned how to query the 
-ledger to ensure that our data looks how we intend it to look.
-
-🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑<b> Optional & Extra Credit - Updating Chaincode </b>🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑
-
-> Note - if you want to update the chaincode - and add in your own functions, you will have to install the <b> updated chaincode</b> by <b> selecting the updated `carauction.js` and `package.json` files </b>. So follow the same process as shown above in step 4 to install chaincode, but use your newly updated files. For the form, you would fill it out as shown below, and keep incrementing the version number on subsequent updates:
-
-```
-Chaincode ID: carauction  
-Chaincode Version: 2
-Chaincode Type: Node
-```
-
-> Then, when you go to click on the action i.e. the three-dot button, there will be an option that says `update`. Choose that one and then keep the same defaults (the simple policy) as shown before. And that's it!
-
-Hope you learned something, and if you find anything missing, encounter a nasty bug, error, etc. please open an issue on this repo above⤴⤴⤴⤴⤴! 🕷🕷🕷
-
-<!-- If you check your downloaded files now, you should have a file starting with `cred` ending in `.json`. Let's rename this file to `creds.json` and move this file to the root of our carauction-network directory.
-
-Open `enrolladmin.js` and the newly downloaded `creds.json` in an editor of your choice. I prefer VSCode. -->
-
-<!-- [![Deploy to IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/IBM/watson-second-opinion) -->
 
 # License
 This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](http://www.apache.org/licenses/LICENSE-2.0.txt).
