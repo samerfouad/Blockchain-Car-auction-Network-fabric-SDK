@@ -1,20 +1,17 @@
 
 # Create a Car Auction Blockchain App with Hyperledger Fabric Node.js Client SDK and IBM Blockchain Platform Starter Plan
 
-In this Code Pattern we will create a blockchain network that simulates a car auction network. 
-
 ### Intro to Certificate Authority
 The first step before diving into the car-auction logic is to enroll our app with our 
 <b>[CA(Certificate Authority)](https://hyperledger-fabric.readthedocs.io/en/release-1.2/identity/identity.html#certificate-authorities)</b> from the IBM Blockchain Platform Starter Plan. 
-To do this, we need to give our app the API endpoints of the CA on the IBM Blockchain Platform Starter plan so that our app can interact with the network. 
-The CA will then provide us with certificates that will prove our authenticity to the network: it will allow us to transact (i.e. invoke chaincode) on the network.
+To do this, we need to give our app the API endpoints of the CA on the IBM Blockchain Platform Starter plan, so that our app can interact with the network. 
+The CA will provide us with certificates that will prove our authenticity to the network: it will allow us to transact (i.e. invoke chaincode) on the network.
 Note - any calls to the Hyperledger Fabric network will have to be signed with a private key and a properly signed X.509 certificate for verification purposes. 
-We need certificates for the admin user. 
 
 ### Intro to Chaincode
 After we have finished generating keys and certificates, we will need to install the chaincode on the peers. 
 After the chaincode is installed, we will instantiate it, which will call the chaincode constructor and initiate some data on the ledger. 
-This is seen in the `initLedger` function from the `chaincode/carauction.js` file.
+This is shown in the `initLedger` function from the `chaincode/carauction.js` file.
 It will create a vehicle, a few members, and a vehicle listing (or a listing on which members can bid on).  
 After that, the members will make offers for the car, which is actually invoking chaincode under the hood. 
 Note - when we <b> invoke chaincode, we are making a transaction </b> on the blockchain network. 
@@ -30,15 +27,9 @@ Once the auction closes, we call the `closeBidding` function from `chaincode/car
 This function will give the car to the highest bidder, and transfer funds from the buyer to the seller. 
 The buyer will gain ownership of the car.
 
-To ensure that our auction has worked correctly, we can query the ledger at the end to ensure that the car has the correct owner, and that the seller has been credited the correct amount in their account.
+To ensure that our auction has worked correctly, we can query the ledger at the end to ensure that the car has the correct owner and that the seller has been credited the correct amount in their account.
 
-## Flow
-1. User downloads IBM Blockchain Platform Starter Plan connection profile and adds url/secret for the CA in the Node app.
-2. User enrolls admin with the CA.
-3. User installs, instantiates, and invokes carauction chaincode on the peer.
-4. Ledger is updated, blocks are added to the Starter Plan service, and the response is sent to the Node app.
-
-# Watch the Video - Setting up the Node app
+# Watch the Video - Setting up the Node App
 https://www.youtube.com/watch?v=3a8ElLxyQAc
 
 # Prerequisites
@@ -50,49 +41,54 @@ Then, click on `Launch`, after our network is created.
 
 # Steps
 
-## Step 1. Clone the repo
-The first thing we need is clone the repo on your local computer.
+## Step 1. Cloning the Repo
+The first thing we need is to clone the repo on our local computer by running the command:
 ```
-$ git clone https://github.com/fady-a-m-ibrahim/car-auction-network-fabric-node-sdk
+git clone https://github.com/fady-a-m-ibrahim/car-auction-network-fabric-node-sdk
 ```
-Then, go ahead and go into the directory:
+Then to go into the directory by running the command:
 ```
-$ cd car-auction-network-fabric-node-sdk
+cd car-auction-network-fabric-node-sdk
 ```
 
-## Step 2. Enroll App 
+## Step 2. Enrolling the admin 
  
 First, we need to generate the necessary keys and certs from the CA to prove our authenticity to the network.
-To do this, we need to download the connection profile, and move it to our current working directory.
+To do this, we need to download the connection profile and move it to our current working directory.
+The steps are as follows:
 1. From IBM Blockchain Platform Starter Plan, we click on the `Overview` tab in the top-left corner.
 2. Then, we click on `Connection Profile`.
 3. Then, we Click on `Download` to download a file that looks something like this: `creds_nde288ef7dd6542d3a1cc824a02be67f1_org1.json`. 
 4. We Rename this file to: `creds.json`.
-<b>And yes, this is important. It needs to be exactly `creds.json`, since this file is referenced at the top of </b>`invoke.js`.
+<b>And yes, this is important. It needs to be exactly `creds.json`, since this file is referenced at the top of </b> the file `invoke.js`, specifically at the line: `var creds = require('./creds.json');`
 5. We move the `creds.json` file to the `car-auction-network-fabric-node-sdk` directory. 
 
 Open `enrolladmin.js` in any editor. We prefer VSCode.
 
 At the begining of the file, we will see 
-```const enrollSecret = = "WRITE_THE_ENROLL_SECRET_HERE";``` 
+
+```const enrollSecret = "WRITE_THE_ENROLL_SECRET_HERE";``` 
+
 We should change `WRITE_THE_ENROLL_SECRET_HERE` by the `enrollSecret` from the `creds.json` file. 
 It something similar to "1dcab332aa".
 
 In the same way we should change 
+
 ```const ca_url_with_port = "WRITE_THE_CA_URL_WITH_PORT_HERE";``` 
+
 by the `url` from the `creds.json`. 
 It something similar to "nde288ef7dd7542d3a1cc824a02be67f1-org1-ca.us02.blockchain.ibm.com:31011".
-Please note, we donot copy `https://`
-We save the file, and run:
+Please note, we donot copy `https://`.
+We save the file, and run the command:
 
 ```
-$ npm install
+npm install
 ```
 
 Then, we run:
 
 ```
-$ node enrollAdmin.js
+node enrollAdmin.js
 ```
 
 ## Step 3. Invoking Chaincode 
@@ -141,11 +137,6 @@ We are choosing the simple policy here to keep things short and simple.
 Next, let's click on the `Channels` tab on the left side. 
 Then, we click on the `defaultchannel`.
 We will see the `total blocks` and `time since last transaction`.
-
-In `invoke.js`, we import our connection profile from IBM Blockchain Platform with this line: 
-```
-var creds = require('./creds.json');
-```
 
 ## Step 4. Running the app 
 
