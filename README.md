@@ -216,7 +216,7 @@ node invoke.js query 1234
 
 Lastly, let's query our vehicle listing. 
 ```
-noe invoke.js query ABCD
+node invoke.js query ABCD
 ```
 
 # License
