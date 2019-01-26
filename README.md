@@ -63,39 +63,39 @@ The steps are as follows:
 <b>And yes, this is important. It needs to be exactly `creds.json`, since this file is referenced at the top of </b> the file `invoke.js`, specifically at the line: `var creds = require('./creds.json');`
 5. We move the `creds.json` file to the `car-auction-network-fabric-node-sdk` directory. 
 
-Open `enrolladmin.js` in any editor. We prefer VSCode.
+We can open `enrolladmin.js` in any editor, but we prefer VSCode.
 
-At the begining of the file, we will see 
+At the beginning of the file, we will see 
 
 ```const enrollSecret = "WRITE_THE_ENROLL_SECRET_HERE";``` 
 
 We should change `WRITE_THE_ENROLL_SECRET_HERE` by the `enrollSecret` from the `creds.json` file. 
-It something similar to "1dcab332aa".
+It is something similar to "1dcab332aa".
 
-In the same way we should change 
+In the same way, we should change 
 
 ```const ca_url_with_port = "WRITE_THE_CA_URL_WITH_PORT_HERE";``` 
 
 by the `url` from the `creds.json`. 
-It something similar to "nde288ef7dd7542d3a1cc824a02be67f1-org1-ca.us02.blockchain.ibm.com:31011".
-Please note, we donot copy `https://`.
+It is something similar to "nde288ef7dd7542d3a1cc824a02be67f1-org1-ca.us02.blockchain.ibm.com:31011".
+Please note, we do not copy `https://`.
 We save the file, and run the command:
 
 ```
 npm install
 ```
 
-Then, we run:
+Then, we run the command:
 
 ```
 node enrollAdmin.js
 ```
 
-## Step 3. Invoking Chaincode 
+## Step 3. Invoking the Chaincode 
 
 We need to install and instantiate the chaincode on the peers. 
-From the `Overview` tab on the left, we click on `Install Code` on the bottom-left hand side of the screen. 
-Then, we click on `Install Chaincode` on the right-side of the screen.
+From the `Overview` tab on the left, we click on `Install Code` on the bottom left hand side of the screen. 
+Then, we click on `Install Chaincode` on the right side of the screen.
 We will be prompted with the following form: 
 
 ```
@@ -118,9 +118,7 @@ To update the chaincode, we need to increase the `Chaincode Version`.
 <b>READ CAREFULLY - UPLOAD BOTH CHAINCODE AND PACKAGE.JSON IN THIS STEP</b>
 
 Choose your chaincode files from the `car-auction-network-fabric-node-sdk/chaincode` directory. 
-Inside that directory, we should find a `package.json` and `carauction.js` file. 
-Select both of those.
-We should see `2 files selected`. 
+Inside that directory, we should select the files `package.json` and `carauction.js`. 
 Then we click `Submit`.
 
 Once the chaincode in installed, we need to instantiate it. 
@@ -136,17 +134,16 @@ We are choosing the simple policy here to keep things short and simple.
 
 Next, let's click on the `Channels` tab on the left side. 
 Then, we click on the `defaultchannel`.
-We will see the `total blocks` and `time since last transaction`.
+We will see the `total blocks` and `time since the last transaction`.
 
-## Step 4. Running the app 
+## Step 4. Running the App 
 
-Now that we have connected our app to the IBM Blockchain Platform, each update of the ledger will be recorded and added as a block. 
-Let's run our app and see what it can do. We start by run the command:
+Let's run our app and see what it can do. We start by running the command:
 
 ```
 node invoke.js initLedger
 ```
-Note that the `initLedger` command, creates a car and assigned the owner of the car to be `memberA@acme.org`. 
+Note that the `initLedger` command creates a car and assigned the owner of the car to be `memberA@acme.org`. 
 
 Then, we can run:
 ```
