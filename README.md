@@ -186,23 +186,23 @@ Lastly, if we check the vehicle listing, we can see that the status is `SOLD`.
 
 ## Step 5. Querying the Ledger
 
-We can query the ledger at any point, using the key corresponding to that object. 
-So first, let's query Member A. 
+We can query the ledger for any object, using the key corresponding to that object. 
+So first, let's query MemberA by running the command. 
 ```
 node invoke.js query memberA@acme.org
 ```
 
-Then, we can query Member C. 
+Then, we can query MemberC by running the command. 
 ```
 node invoke.js query memberB@acme.org
 ```
 
-Now if we query the vehicle number, we should see the owner be memberC. 
+Also, we query the vehicle number to see the new owner by running the command. 
 ```
 node invoke.js query 1234
 ```
 
-Lastly, let's query our vehicle listing. 
+Lastly, let's query our vehicle listing by running the command. 
 ```
 node invoke.js query ABCD
 ```
