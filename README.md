@@ -62,30 +62,34 @@ $ cd car-auction-network-fabric-node-sdk
 
 ## Step 2. Enroll App 
  
-First, we need to generate the necessary keys and certs from the Certificate Authority to prove our authenticity to the network.
-To do this, we need to download the connection profile, and move it to our current working directory. 
+First, we need to generate the necessary keys and certs from the CA to prove our authenticity to the network.
+To do this, we need to download the connection profile, and move it to our current working directory.
 1. From IBM Blockchain Platform Starter Plan, we click on the `Overview` tab in the top-left corner.
-2. From the `Overview` tab, we click on `Connection Profile`.
+2. Then, we click on `Connection Profile`.
 3. Then, we Click on `Download` to download a file that looks something like this: `creds_nde288ef7dd6542d3a1cc824a02be67f1_org1.json`. 
-4. Rename the file to: `creds.json`. 
+4. We Rename this file to: `creds.json`.
 <b>And yes, this is important. It needs to be exactly `creds.json`, since this file is referenced at the top of </b>`invoke.js`.
-5. Move the `creds.json` file to the `car-auction-network-fabric-node-sdk` directory. 
+5. We move the `creds.json` file to the `car-auction-network-fabric-node-sdk` directory. 
 
-Open `enrolladmin.js` in an editor of your choice. I prefer VSCode.
+Open `enrolladmin.js` in any editor. We prefer VSCode.
 
-At the begining of the file, we will see `const enrollSecret = = "WRITE_THE_ENROLL_SECRET_HERE";`. 
-We should change `WRITE_THE_ENROLL_SECRET_HERE` by the `enrollSecret` from the Certificate Authority. 
+At the begining of the file, we will see 
+```const enrollSecret = = "WRITE_THE_ENROLL_SECRET_HERE";``` 
+We should change `WRITE_THE_ENROLL_SECRET_HERE` by the `enrollSecret` from the `creds.json` file. 
 It something similar to "1dcab332aa".
-In the same way we should change `const ca_url_with_port = "WRITE_THE_CA_URL_WITH_PORT_HERE";` by the `url` from the Certificate Authority. 
+
+In the same way we should change 
+```const ca_url_with_port = "WRITE_THE_CA_URL_WITH_PORT_HERE";``` 
+by the `url` from the `creds.json`. 
 It something similar to "nde288ef7dd7542d3a1cc824a02be67f1-org1-ca.us02.blockchain.ibm.com:31011".
 Please note, we donot copy `https://`
-Save your file, and run:
+We save the file, and run:
 
 ```
 $ npm install
 ```
 
-Then, run this command to enroll the admin:
+Then, we run:
 
 ```
 $ node enrollAdmin.js
@@ -94,8 +98,9 @@ $ node enrollAdmin.js
 ## Step 3. Invoking Chaincode 
 
 We need to install and instantiate the chaincode on the peers. 
-From the `Overview` tab on the left, click on `Install Code` on the bottom-left hand side of the screen. Then, click on `Install Chaincode` on the right-side of the screen.
-You should be prompted with the following form: 
+From the `Overview` tab on the left, we click on `Install Code` on the bottom-left hand side of the screen. 
+Then, we click on `Install Chaincode` on the right-side of the screen.
+We will be prompted with the following form: 
 
 ```
 Chaincode ID:   
@@ -103,7 +108,7 @@ Chaincode Version:
 Chaincode Type: 
 ```
 
-Fill it out as shown below: 
+We fill it out by: 
 
 ```
 Chaincode ID: carauction  
@@ -112,70 +117,61 @@ Chaincode Type: Node
 ```
 
 Note: `Chaincode Version` should match the version in the `package.json`. 
-
 To update the chaincode, we need to increase the `Chaincode Version`. 
 
 <b>READ CAREFULLY - UPLOAD BOTH CHAINCODE AND PACKAGE.JSON IN THIS STEP</b>
 
 Choose your chaincode files from the `car-auction-network-fabric-node-sdk/chaincode` directory. 
-Inside that directory, you should find a `package.json` and `carauction.js` file. Select both of those.
-You should see `2 files selected`. Then click `Submit`.
+Inside that directory, we should find a `package.json` and `carauction.js` file. 
+Select both of those.
+We should see `2 files selected`. 
+Then we click `Submit`.
 
-Once the chaincode in installed, we need to instantiate it. From the same screen, click on the 
-3-dot symbol under `Actions`. Then click `Instantiate`.
+Once the chaincode in installed, we need to instantiate it. 
+From the same screen, we click on the 3-dot symbol under `Actions`. 
+Then we click `Instantiate`.
 
-For `Chaincode Type` select `Node`. Then click `Next`. 
-Next, leave the defaults on the next screen, which show a simple endorsement policy. 
-Just click `Submit`. 
+For `Chaincode Type` we select `Node`. 
+Then we click `Next`. 
+Next, we leave the defaults on the next screen, which show a simple endorsement policy. 
+Then, we click `Submit`. 
 Note - the policy specifies which peers will need to validate a new transaction. 
 We are choosing the simple policy here to keep things short and simple. 
 
 Next, let's click on the `Channels` tab on the left side. 
-Then click on the `defaultchannel`.
-You should see the `total blocks` and `time since last transaction`.
+Then, we click on the `defaultchannel`.
+We will see the `total blocks` and `time since last transaction`.
 
-Open `invoke.js` in the editor of your choice. You'll see at the top of the file
-we import our connection profile from IBM Blockchain Platform with this line: 
-
+In `invoke.js`, we import our connection profile from IBM Blockchain Platform with this line: 
 ```
 var creds = require('./creds.json');
 ```
 
-Just save the file and then use this command to invoke chaincode on our network:
-
-```
-$ node invoke.js
-```
-
-Lastly, we can refresh our page where we can see the details of `defaultchannel` and we should see a our total blocks increase by one. 
-This is due to our last call to `invoke.js`. 
-
 ## Step 4. Running the app 
 
 Now that we have connected our app to the IBM Blockchain Platform, each update of the ledger will be recorded and added as a block. 
-Let's run our app and see what it can do. 
+Let's run our app and see what it can do. We start by run the command:
 
-Note that in initLedger we created a car and assigned the owner of the car to be `memberA@acme.org`. 
-Our auction does not allow the owner of car to bid on his/her own car. 
-<b>Thus, this call should give us an error.</b> 
-This step is to show you the error throwing capabilities of the chaincode.
-Let's try it. Save `invoke.js` and then run this command to invoke our app. 
+```
+node invoke.js initLedger
+```
+Note that the `initLedger` command, creates a car and assigned the owner of the car to be `memberA@acme.org`. 
 
-
+Then, we can run:
 ```
 node invoke.js makeOffer 3000 ABCD memberA@acme.org
 ```
+Our auction does not allow the owner of car to bid on his/her own car. 
+<b>Thus, this call should give us an error.</b> 
 
-You should get an error message. 
-
-Next, let's give a successful transaction. 
+Next, let's give a successful transaction by running. 
 ```
 node invoke.js makeOffer 4000 ABCD memberB@acme.org
 ```
 This should work, and now we have an offer from MemberB coming in at $4,000. 
 If we check the channel in Starter Plan, we can see the data that was written to the ledger.
 
-Next, let's give another successful offer. 
+Next, let's give another successful offer by running. 
 ```
 node invoke.js makeOffer 5000 ABCD memberC@acme.org
 ```
@@ -183,60 +179,42 @@ This will create an offer from Member C coming in at $5,000, which is greater th
 If we check the Starter Plan again, we can see this data being written to the ledger, and the block count
 increasing by one.
 
-Next, let's give an offer that is too high...that is the offer is greater than the balance in the account.
-<b> Note - this should throw an error. This is to show error checks of the chaincode. </b>
+Next, let's give an offer that is too high, i.e., it is greater than the balance in the account.
 ```
 node invoke.js makeOffer 5001 ABCD memberB@acme.org
 ```
 Since our members are initialized with a balance of $5,000, this will not work. 
+
 Lastly, let's close the bidding. 
 ```
 node invoke.js closeBidding ABCD
 ```
-You should get a successful response. If you check the output of the block details, we can see 
-that the new owner of the car is MemberC. We also see that Member C now has $0 in their balance,
-since they had $5,000 to start with, and their bid of $5,000 won the auction. That means that 
-the new owner is Member C, and that Member A, the original owner of the car, will be credited
-$5,000. This is reflected on the ledger - Member A now has a balance of $10,000. Lastly,
-if we check the vehicle listing, we can see that the status is `SOLD`.
+We should get a successful response. 
+If you check the output of the block details, we can see that the new owner of the car is MemberC. 
+We also see that Member C now has $0 in their balance, since they had $5,000 to start with, and their bid of $5,000 won the auction. 
+That means that the new owner is Member C, and that Member A, the original owner of the car, will be credited $5,000. 
+This is reflected on the ledger - Member A now has a balance of $10,000. 
+Lastly, if we check the vehicle listing, we can see that the status is `SOLD`.
 
 ## Step 5. Querying the Ledger
 
-Now that we have submitted transactions on the ledger, we can query the ledger at any point, using the 
-key corresponding to that object. So first, let's query Member A. This is the member that just won 
-the auction, so they should have $10,000 in their account. 
+We can query the ledger at any point, using the key corresponding to that object. 
+So first, let's query Member A. 
 ```
 node invoke.js query memberA@acme.org
 ```
 
-Our response should look something like this:
-
-```
-Response is  {"balance":10000,"firstName":"Amy","lastName":"Williams"}
-```
-
-We can query memberB as follows, but this is not too interesting since memberB 
-did not win the auction.
-
-Now, if we query memberC, we should see that their balance is 0. The 
-request should look as follows for memberC:
-
+Then, we can query Member C. 
 ```
 node invoke.js query memberB@acme.org
 ```
 
 Now if we query the vehicle number, we should see the owner be memberC. 
-Let's do that with the following request:
-
 ```
 node invoke.js query 1234
 ```
 
-Lastly, and most interestingly, let's query our vehicle listing. 
-It should show up s being SOLD, and should have no offers.
-
-The request:
-
+Lastly, let's query our vehicle listing. 
 ```
 noe invoke.js query ABCD
 ```
