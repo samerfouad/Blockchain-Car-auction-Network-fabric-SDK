@@ -35,7 +35,7 @@ https://www.youtube.com/watch?v=3a8ElLxyQAc
 # Prerequisites
 1. NPM version >= 5.6.0 
 2. Node version >= 8.10.0
-3. If we do not have an IBM Cloud account yet, we will need to create one [here](https://ibm.biz/BdjLxy).
+3. If we do not have an IBM Cloud account yet, we will need to create one [here](https://ibm.biz/Bd2FAj).
 4. In our IBM Cloud account, we create a Blockchain Starter Plan service on your IBM Cloud account.
 Then, click on `Launch`, after our network is created. 
 
