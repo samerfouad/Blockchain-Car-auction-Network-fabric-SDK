@@ -42,7 +42,7 @@ Lastly, we will check the logs of the peers on the IBM Blockchain Platform Start
 3. User installs, instantiates, and invokes carauction chaincode on the peer.
 4. Ledger is updated, blocks are added to the Starter Plan service, and the response is sent to Node app.
 
-# Watch the Video - Setting up the Node app (Part 1)
+# Watch the Video - Setting up the Node app
 https://www.youtube.com/watch?v=3a8ElLxyQAc
 
 # Prerequisites
@@ -65,43 +65,19 @@ $ cd car-auction-network-fabric-node-sdk
 ```
 
 ## Step 2. Enroll App 
- ![packageFile](/docs/enrollAdmin.gif)
-
+ 
 First, we need to generate the necessary keys and certs from the Certificate Authority to prove our authenticity to the network.
 To do this, we will go into our new IBM Blockchain Platform Starter Plan network, and from the `Overview` Tab on the left, we will click on `Connection Profile` on the right-side of the page. Then click on `Raw JSON`.
 
 Open `enrolladmin.js` in an editor of your choice. I prefer VSCode.
 
-Down around line 40 of the file, you will see a new instance of the Fabric_CA_Client. This is where we
-need to give our application the necessary endpoints of our CA from our IBM Blockchain Platform Starter Plan.
-
-We will need 4 things from the Certificate Authority
-1) `enrollId` - should be "admin"
-2) `enrollSecret` - should be similar to "1dcab332aa"
-3) `url` - should be similar to 
-"nde288ef7dd7542d3a1cc824a02be67f1-org1-ca.us02.blockchain.ibm.com:31011"
-4) `caName` - should be "org1CA"
-
-Your code should look something like this when finished:
-
-```
-fabric_ca_client = new Fabric_CA_Client('https://admin:4352f3499a@nd61fdbe87a194a10bde3cccdb90d427e-org1-ca.us04.blockchain.ibm.com:31011', null ,"org1CA", crypto_suite);
-```
-
-Once you fill out the necessary info as shown in the gif above, move down to the call to 
-enroll the CA. You will need to add in the enrollSecret there again. Should be around 
-line 55. 
-
-Your code should look something like this when finished (note, this is just a small chunk of the code)
-
-```
-return fabric_ca_client.enroll({
-          enrollmentID: 'admin',
-          enrollmentSecret: '4252f3499a'
-        }).then((enrollment) =>
-```
-
-Save your file, and run npm install:
+At the begining of the file, we will see `const enrollSecret = = "WRITE_THE_ENROLL_SECRET_HERE";`. 
+We should change `WRITE_THE_ENROLL_SECRET_HERE` by the `enrollSecret` from the Certificate Authority. 
+It something similar to "1dcab332aa".
+In the same way we should change `const ca_url_with_port = "WRITE_THE_CA_URL_WITH_PORT_HERE";` by the `url` from the Certificate Authority. 
+It something similar to "nde288ef7dd7542d3a1cc824a02be67f1-org1-ca.us02.blockchain.ibm.com:31011".
+Please note, we donot copy `https://`
+Save your file, and run:
 
 ```
 $ npm install
@@ -113,58 +89,7 @@ Then, run this command to enroll the admin:
 $ node enrollAdmin.js
 ```
 
-If all went well, you should get a response like this.
-
-```
-carauction 👉🏼  node enrollAdmin.js
- Store path:/Users/Horea.Porutiu@ibm.com/Workdir/blockchain/carauction/hfc-key-store
-(node:86820) 
-Successfully enrolled admin user "admin"
-Assigned the admin user to the fabric client ::{"name":"admin","mspid":"org1","roles":null,"affiliation":"","enrollmentSecret":"","enrollment":{"signingIdentity":"b*4d7843af972bcfb7dac51f641458af95a54b4904d98da67e5b1db934adf35a","identity":{"certificate":"-----BEGIN CERTIFICATE-----\nMIIB8TCCAZigAwIBAgIULHILXwt3DhxQSW7gdzNmziY18iAwCgYIKoZIzj0EAwIw\nbzELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK\nEwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMSAwHgYDVQQDExdmYWJyaWMt\nY2Etc2VydmVyLW9yZzFDQTAeF*0xODA5MTcxODMxMDBaFw0xOTA5MTcxODM2MDBa\nMCExDzANBgNVBAsTBmNsaWVudDEOMAwGA1UEAxMFYWRtaW4wWTATBgcqhkjOPQIB\nBggqhkjOPQMBBwNCAAQIDN3iZJeoQbFE7+3ShqlhQd6cYsxrOAWs3nGlv/SC+qQV\nQd33uwkkbcs8PTVlWgM6FsmoNZfMEhx5LH1pW+y0o2AwXjAOBgNVHQ8BAf8EBAMC\nB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUuI4+VTbgNTXcnYg+8qpGXf/mUmIw\nHwYDVR0jBBgwFoAUo/8jv0agwT3tol8HsbOmorxdijkwCgYIKoZIzj0EAwIDRwAw\nRAIgTEJKJL6/U/wMgxqG25K5NW4A5+ie1vG9qi7zP98wVVoCIB7hV0en6cV3nI9L\nMdWPTvgrB67CCL8Ay+yJ25B8hMO9\n-----END CERTIFICATE-----\n"}}}
-```
-
-## Step 3. Register Users 
-![packageFile](/docs/registerUser.gif)
-
-Now that we have generated our client side certificates, and stored them in `htc-key-store`, we need
-to register our application so that the network recognizes it. 
-
-Open `registerUser.js` in the editor of your choice. On line 42, we can see a new instance of the 
-Fabric_ca_client being created. We can simply copy our existing instance from `enrollAdmin.js`. This is 
-very important <b> your URL should be the same as in `enrollAdmin.js` </b>.
-
-After you copy and paste, the code in `registerUser.js` should look like this on line 42, except
-your credentials will be different than mine:
-
-```
-fabric_ca_client = new Fabric_CA_Client('https://admin:4352f3499a@nd61fdbe87a194a10bde3cccdb90d427e-org1-ca.us04.blockchain.ibm.com:31011', null ,"org1CA", crypto_suite);
-```
-
-Note that from the first gif to the second gif that my credentials changed. That is just 
-because I needed to get a new network. Yours will remain the same.  
-
-Now, run this command to register and enroll `user1`. You can only register an identity once. If you 
-get errors, it is probably because that user is already registered - you can try it with a different name. 
-
-```
-$ node registerUser.js 
-```
-
-If successful, output should be something like this: 
-
-```
-carauction 👉🏼  node registerUser.js
- Store path:/Users/Horea.Porutiu@ibm.com/Workdir/blockchain/carauction/hfc-key-store
-Successfully loaded admin from persistence
-Successfully registered user1 - secret:OnqVuU*tCwPU
-Successfully enrolled member user "user1"User1 was successfully registered and enrolled and is ready to interact with the fabric network
-```
-
-If you get an error (connection timeout) - don't worry. If you go to the top-right corner of IBM Blockchain Platform, and then click *reset network* and then you run through the steps again, everything should work. 
-
-🙌🏼 Nice! You are almost there!
-
-## Step 4. Invoking Chaincode 
+## Step 3. Invoking Chaincode 
 ![packageFile](/docs/invoke.gif)
 
 Now, we need to download the connection profile, and move it to our current working directory. 
@@ -513,56 +438,11 @@ Chaincode Type: Node
 
 Hope you learned something, and if you find anything missing, encounter a nasty bug, error, etc. please open an issue on this repo above⤴⤴⤴⤴⤴! 🕷🕷🕷
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- If you check your downloaded files now, you should have a file starting with `cred` ending in `.json`. Let's rename this file to `creds.json` and move this file to the root of our carauction-network directory.
 
 Open `enrolladmin.js` and the newly downloaded `creds.json` in an editor of your choice. I prefer VSCode. -->
 
-
-
-
-
-
-
-
-
-
-
-
 <!-- [![Deploy to IBM Cloud](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/IBM/watson-second-opinion) -->
-# Links
-
-* [IBM Blockchain - Marbles demo](https://github.com/IBM-Blockchain/marbles)
-* [Hyperledger Fabric Docs](https://hyperledger-fabric.readthedocs.io/en/release-1.2/)
-
-
-# Learn more
-
-* **Blockchain Code Patterns**: Enjoyed this Code Pattern? Check out our other [Blockchain Code Patterns](https://developer.ibm.com/code/technologies/blockchain/)
-
-* **Blockchain 101**: Learn why IBM believes that blockchain can transform businesses, industries – and even the world. [Blockchain 101](https://developer.ibm.com/code/technologies/blockchain/)
 
 # License
 This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](http://www.apache.org/licenses/LICENSE-2.0.txt).
