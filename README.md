@@ -1,15 +1,13 @@
-[![Build Status](https://travis-ci.com/IBM/car-auction-network-fabric-node-sdk.svg?branch=master)](https://travis-ci.com/IBM/car-auction-network-fabric-node-sdk)
 
-# Create a car auction network with Hyperledger Fabric Node.js SDK and IBM Blockchain Starter Plan
+# Create a car auction network with Hyperledger Fabric Node.js Client SDK and IBM Blockchain Platform Starter Plan
 
-In this Code Pattern we will create a blockchain network that simulates a car auction network. This network is based on an existing Hyperledger Composer application, which you can find [here](https://github.com/hyperledger/composer-sample-networks/tree/master/packages/carauction-network).
+In this Code Pattern we will create a blockchain network that simulates a car auction network. 
 
 ### Intro to Certificate Authority
 
-The first 
-step before diving into the car-auction logic is to enroll our application with our 
-<b>[CA(Certificate Authority)](https://hyperledger-fabric.readthedocs.io/en/release-1.2/identity/identity.html#certificate-authorities)</b> from the IBM Blockchain Starter Plan. To do this, we need to 
-give our application the API endpoints of the CA on the IBM Blockchain Starter plan so that our 
+The first step before diving into the car-auction logic is to enroll our application with our 
+<b>[CA(Certificate Authority)](https://hyperledger-fabric.readthedocs.io/en/release-1.2/identity/identity.html#certificate-authorities)</b> from the IBM Blockchain Platform Starter Plan. To do this, we need to 
+give our application the API endpoints of the CA on the IBM Blockchain Platform Starter plan so that our 
 app can interact with the network. The CA will then provide us with certificates that will prove 
 our authenticity to the network: it will allow us to transact (i.e. invoke chaincode) on the network.
 Note - any calls to the Hyperledger Fabric network will have to be signed with a private key and a
@@ -22,7 +20,7 @@ both an admin user, and a new user, that we can call `user1`.
 After we have finished generating 
 keys and certificates, we will need to install the chaincode on the peers. After the chaincode 
 is installed, we will instantiate it, which will call the chaincode constructor and initiate 
-some data on the ledger. This is seen in the `initLedger` function from the `chaincode/carauction.js` file: https://github.com/IBM/car-auction-network-fabric-node-sdk/blob/master/chaincode/carauction.js#L50.
+some data on the ledger. This is seen in the `initLedger` function from the `chaincode/carauction.js` file.
  It will create a vehicle, a few members, and a vehicle listing (or a 
 listing on which members can bid on).  After that, the members will make offers for the car, which is actually invoking 
 chaincode under the hood. Note - when we <b> invoke chaincode, we are making a transaction </b> 
@@ -32,75 +30,36 @@ on the network. When we make an offer, the chaincode will check for two types of
 1) If the owner of the car bids on their own car
 2) If the bidder has enough money in their account to make the bid
 
-If both checks are passed, an offer is recorded on the ledger. Once the auction closes, we call the `closeBidding` transaction as seen in the `chaincode/carauction.js` file: https://github.com/IBM/car-auction-network-fabric-node-sdk/blob/master/chaincode/carauction.js#L273. That will give the car to the highest bidder, and transfer funds from the buyer to the seller. The buyer will gain ownership of the car.
+If both checks are passed, an offer is recorded on the ledger. Once the auction closes, we call the `closeBidding` transaction as seen in the `chaincode/carauction.js` file. That will give the car to the highest bidder, and transfer funds from the buyer to the seller. The buyer will gain ownership of the car.
 
 To ensure that our auction has worked correctly, we can query the ledger at the end to ensure that the car has the correct owner, and that the seller has been credited the correct amount in their account.
 
-Lastly, we will check the logs of the peers on the IBM Blockchain Starter Plan, and also view the details of the blocks to see how transactions are recorded.
-
-When the reader has completed this Code Pattern, they will understand how to:
-
-* Interact with IBM Blockchain Starter Plan
-* Build a blockchain network using Hyperledger Fabric Node SDK
-* Inspect and read logs from applications connected to IBM Blockchain Starter Plan
-
-![Architecture](/docs/app-architecture.png)
+Lastly, we will check the logs of the peers on the IBM Blockchain Platform Starter Plan, and also view the details of the blocks to see how transactions are recorded.
 
 ## Flow
-1. User downloads IBM Blockchain Starter Plan connection profile 
-and adds url/secret for Certificate Authority in the Node app
-2. User enrolls admin, and registers a user with the Certificate Authority
-3. User installs, instantiates, and invokes carauction chaincode on the peer
+1. User downloads IBM Blockchain Platform Starter Plan connection profile and adds url/secret for Certificate Authority in the Node app.
+2. User enrolls admin with the Certificate Authority.
+3. User installs, instantiates, and invokes carauction chaincode on the peer.
 4. Ledger is updated, blocks are added to the Starter Plan service, and the response is sent to Node app.
 
-## Included components
-* [IBM Blockchain Starter Plan](https://console.bluemix.net/catalog/services/blockchain): Use the IBM Blockchain Platform to simplify the developmental, governmental, and operational aspects of creating a blockchain solution.
-
-## Featured technologies
-* [IBM Blockchain](https://www.ibm.com/blockchain): Blockchain is a shared, immutable ledger for recording the history of transactions.
-* [Cloud](https://www.ibm.com/developerworks/learn/cloud/): Accessing computer and information technology resources through the Internet.
-
 # Watch the Video - Setting up the Node app (Part 1)
-
-[![](docs/part1.png)](https://www.youtube.com/watch?v=3a8ElLxyQAc)
-
-# Watch the Video - Invoking the Node app (Part 2)
-
-[![](docs/part2.png)](https://www.youtube.com/watch?v=R16yLvs6Aeo)
+https://www.youtube.com/watch?v=3a8ElLxyQAc
 
 # Prerequisites
 1. NPM version >= 5.6.0 
 2. Node version >= 8.10.0
 3. If you do not have an IBM Cloud account yet, you will need to create one [here](https://ibm.biz/BdjLxy).
-4. In your IBM Cloud account, create a Blockchain Starter Plan service on your IBM Cloud account, as shown below:
-
-![nyDSaF](https://i.makeagif.com/media/4-11-2018/nyDSaF.gif)
-
-
-Then, click on `Launch`, after your network is created. All commands in this tutorial that are 
-outside of your editor will be in this newly created network. <b>I will refer to it as "IBM Blockchain Starter Plan" from now on.</b>
-
-
+4. In your IBM Cloud account, create a Blockchain Starter Plan service on your IBM Cloud account.
+Then, click on `Launch`, after your network is created. 
 
 # Steps
 
-1. [Clone the repo](#step-1-clone-the-repo)
-2. [Enroll App](#step-2-enroll-app)
-3. [Register Users](#step-3-register-users)
-4. [Invoking Chaincode](#step-4-invoking-chaincode)
-5. [Running the app](#step-5-running-the-app)
-6. [Querying the ledger](#step-6-querying-the-ledger)
-7. [Conclusion + Updating Chaincode](#step-7-conclusion--updating-chaincode)
-
-
 ## Step 1. Clone the repo
 The first thing we need to do is clone the repo on your local computer.
-
 ```
-$ git clone https://github.com/IBM/car-auction-network-fabric-node-sdk
+$ git clone https://github.com/fady-a-m-ibrahim/car-auction-network-fabric-node-sdk
 ```
 Then, go ahead and go into the directory:
-
 ```
 $ cd car-auction-network-fabric-node-sdk
 ```
@@ -109,12 +68,12 @@ $ cd car-auction-network-fabric-node-sdk
  ![packageFile](/docs/enrollAdmin.gif)
 
 First, we need to generate the necessary keys and certs from the Certificate Authority to prove our authenticity to the network.
-To do this, we will go into our new IBM Blockchain Starter Plan network, and from the `Overview` Tab on the left, we will click on `Connection Profile` on the right-side of the page. Then click on `Raw JSON`.
+To do this, we will go into our new IBM Blockchain Platform Starter Plan network, and from the `Overview` Tab on the left, we will click on `Connection Profile` on the right-side of the page. Then click on `Raw JSON`.
 
 Open `enrolladmin.js` in an editor of your choice. I prefer VSCode.
 
 Down around line 40 of the file, you will see a new instance of the Fabric_CA_Client. This is where we
-need to give our application the necessary endpoints of our CA from our IBM Blockchain Starter Plan.
+need to give our application the necessary endpoints of our CA from our IBM Blockchain Platform Starter Plan.
 
 We will need 4 things from the Certificate Authority
 1) `enrollId` - should be "admin"
@@ -209,7 +168,7 @@ If you get an error (connection timeout) - don't worry. If you go to the top-rig
 ![packageFile](/docs/invoke.gif)
 
 Now, we need to download the connection profile, and move it to our current working directory. 
-1. Go back to your IBM Blockchain Starter Plan, and click on the `Overview` tab in the top-left corner.
+1. Go back to your IBM Blockchain Platform Starter Plan, and click on the `Overview` tab in the top-left corner.
 2. From the `Overview` tab, click on `Connection Profile`.
 3. Once you click on `Connection Profile` you'll have an option to view as `Raw JSON` or `Download`. Click on `Download`. 
 
@@ -435,7 +394,7 @@ the new owner is Member C, and that Member A, the original owner of the car, wil
 $5,000. This is reflected on the ledger - Member A now has a balance of $10,000. Lastly,
 if we check the vehicle listing, we can see that the status is `SOLD`.
 
-Awesome! You just successfully ran an auction app while using Hyperledger Fabric Node SDK + IBM Blockchain
+Awesome! You just successfully ran an auction app while using Hyperledger Fabric Node SDK + IBM Blockchain Platform
 Starter Plan. There's only one more thing I want to show you before you leave...
 
 ## Step 6. Querying the Ledger
