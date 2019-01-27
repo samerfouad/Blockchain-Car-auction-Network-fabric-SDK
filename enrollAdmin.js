@@ -42,6 +42,7 @@ Fabric_Client.newDefaultKeyValueStore({
   } else {
     return fabric_ca_client.enroll({
       enrollmentID: enrollID,
+      mspid: 'org1',
       enrollmentSecret: enrollSecret
     }).then((enrollment) => {
       return fabric_client.createUser(
